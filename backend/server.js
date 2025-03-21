@@ -5,6 +5,7 @@ import { connectDB } from "./config/db.js";
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js'
 import {v2 as cloudinary} from "cloudinary"
+import postRoutes from "./routes/post.routes.js"
 
 const app = express()
 
@@ -23,6 +24,7 @@ cloudinary.config({
 })
 app.use("/api/auth", authRoutes)
 app.use("/api/user", userRoutes)
+app.use("/api/posts", postRoutes)
 
 app.get('/', (req, res) => {
     res.send("Server is ready")

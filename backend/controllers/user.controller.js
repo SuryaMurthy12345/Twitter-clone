@@ -1,6 +1,5 @@
 import Notificiation from "../models/notification.model.js"
 import {v2 as cloudinary} from "cloudinary"
-import user from "../models/user.models.js"
 import User from "../models/user.models.js"
 import bcrypt from "bcrypt"
 

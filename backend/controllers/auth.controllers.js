@@ -31,7 +31,7 @@ export const signup = async (req, res) => {
         const newUser = new User({ fullName, username, email, password: hashedPassword })
 
         if (newUser) {
-            generateTokenAndSetCookie(newUser._id, res)
+            generateTokenAndSetCookie(newUser._id, username ,res)
             await newUser.save()
             res.status(201).json({
                 _id: newUser.id,
@@ -61,7 +61,7 @@ export const login = async (req, res) => {
             return res.status(400).json({ error: "Invalid Credentials" })
         }
 
-        generateTokenAndSetCookie(user._id, res);
+        generateTokenAndSetCookie(user._id,username, res);
         res.status(200).json({
             _id: user.id,
             fullName: user.fullName,
