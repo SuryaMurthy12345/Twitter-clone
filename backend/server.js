@@ -24,7 +24,7 @@ cloudinary.config({
 })
 app.use("/api/auth", authRoutes)
 app.use("/api/user", userRoutes)
-app.use("/api/posts", postRoutes)
+app.use("/api/posts", postRoutes) 
 
 app.get('/', (req, res) => {
     res.send("Server is ready")

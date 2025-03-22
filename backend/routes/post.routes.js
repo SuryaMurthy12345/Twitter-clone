@@ -1,5 +1,5 @@
 import e from "express";
-import { createPost,deletePost, likeUnlikePost, commentOnPost,getCommentsOFPost,allPosts, getLikedPosts } from "../controllers/post.controller.js";
+import { createPost,deletePost, likeUnlikePost, commentOnPost,getCommentsOFPost,allPosts, getLikedPosts, FollowingPosts, userPosts } from "../controllers/post.controller.js";
 import { protectRoute } from "../middleware/protectRoute.js";
 const router = e.Router() 
 
@@ -12,6 +12,10 @@ router.get("/getAllComments/:id",protectRoute,getCommentsOFPost)
 
 router.get("/",protectRoute,allPosts)
 
-router.get("/likedposts",protectRoute,getLikedPosts)
+router.get("/likedposts",protectRoute,getLikedPosts) 
+
+router.get("/getFollowingPosts",protectRoute,FollowingPosts) 
+
+router.get("/user/:username",protectRoute,userPosts)
 
 export default router
