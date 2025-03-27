@@ -1,51 +1,51 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Signup from './Signup';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Signin from './Signin';
+import Signup from './Signup';
 import { api } from './config';
 
-import Dashboard from './DashboardPages/Dashboard'; 
-
-import Profile from './SidebarPages/Profile';
+import Dashboard from './DashboardPages/Dashboard';
 import Notification from './SidebarPages/Notification';
-
+import Profile from './SidebarPages/Profile';
 
 const App = () => {
-  const [auth, setAuth] = useState(null); // Initially null to prevent flashing
+  const [auth, setAuth] = useState(null); // ✅ Prevents flashing
 
-  useEffect(() => {
+  const verifyUser = () => {
     fetch(`${api}/api/auth/me`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
     })
       .then(response => {
-        if (response.ok) {
-          setAuth(true);
-          return response.json();
-        }
+        if (response.ok) return response.json();
         throw new Error('Failed to verify user');
       })
+      .then(() => setAuth(true))
       .catch(error => {
         setAuth(false);
         console.error('Verify Error:', error);
       });
-  }, []); // ✅ Runs only once on mount
+  };
+
+  useEffect(() => {
+    verifyUser();
+  }, [auth]); // ✅ Runs on mount + when auth changes
 
   if (auth === null) return <div>Loading...</div>; // ✅ Prevents flashing
 
   return (
     <div>
       <Routes>
-        <Route path='/signup' element={<Signup />} />
-        <Route path='/signin' element={<Signin />} /> 
-
-        <Route path='/notification' element={<Notification/>} /> 
-        <Route path='/profile' element={<Profile/>}/> 
+        <Route path='/signup' element={<Signup setAuth={setAuth} />} /> {/* ✅ Pass setAuth */}
+        <Route path='/signin' element={<Signin setAuth={setAuth} />} /> {/* ✅ Pass setAuth */}
+        <Route path='/notification' element={<Notification />} />
+        <Route path='/profile' element={<Profile />} />
 
         <Route path='/dashboard' element={auth ? <Dashboard /> : <Navigate to='/signin' />} />
         <Route path='/' element={auth ? <Navigate to='/dashboard' /> : <Navigate to='/signin' />} />
       </Routes>
+
     </div>
   );
 };

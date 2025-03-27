@@ -1,14 +1,14 @@
-import { set } from "mongoose";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { api } from "./config";
 
-const Signup = () => {
+const Signup = ({ setAuth }) => {
     const [data, setData] = useState({
         email: "",
         username: "",
         password: "",
         fullName: "",
-    }); 
+    });
     const navigate = useNavigate();
 
     const [message, setMessage] = useState(""); // State for messages
@@ -21,7 +21,7 @@ const Signup = () => {
         e.preventDefault(); // Prevent page reload
 
         try {
-            const response = await fetch("http://localhost:8000/api/auth/signup", {
+            const response = await fetch(`${api}/api/auth/signup`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -32,12 +32,13 @@ const Signup = () => {
 
             const result = await response.json();
             if (response.ok) {
-                setMessage("User created successfully. Please sign in."); 
-                setTimeout(() => navigate("/dashboard"),2000);
+                setMessage("User created successfully.");
+                setAuth(true)
+                setTimeout(() => navigate("/"), 2000);
             } else {
                 setMessage(result.error || "Signup failed. Try again.");
             }
-            
+
         } catch (err) {
             console.error("Signup Error:", err);
             setMessage("Something went wrong. Please try again.");

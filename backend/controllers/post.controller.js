@@ -37,39 +37,55 @@ export const deletePost = async (req, res) => {
 
 export const likeUnlikePost = async (req, res) => {
     try {
-        const { id } = req.params
-        const userid = req.user._id
+        const { id } = req.params;
+        const userid = req.user._id;
 
-        const thatPost = await Post.findById(id)
+        const thatPost = await Post.findById(id).populate("user");
 
-        const hasLike = thatPost.likes.includes(userid)
+        if (!thatPost) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        const hasLike = thatPost.likes.includes(userid);
+        let updatedPost;
 
         if (!hasLike) {
-            await Post.findByIdAndUpdate(id, { $push: { likes: userid } })
-            res.status(201).json({ message: "Liked successfully", likes: thatPost.likes, text: "like" })
+            updatedPost = await Post.findByIdAndUpdate(
+                id,
+                { $push: { likes: userid } },
+                { new: true } // Returns the updated document
+            );
 
-            const newnotification = new Notification({
+            const newNotification = new Notification({
                 type: "like",
                 from: userid,
-                to: thatPost.user
-            })
-            await newnotification.save()
+                to: thatPost.user,
+            });
+            await newNotification.save();
+
+            return res.status(201).json({
+                message: "Liked successfully",
+                likes: updatedPost.likes, // Return updated likes
+                text: "like",
+            });
+        } else {
+            updatedPost = await Post.findByIdAndUpdate(
+                id,
+                { $pull: { likes: userid } },
+                { new: true } // Returns the updated document
+            );
+
+            return res.status(201).json({
+                message: "Unliked successfully",
+                likes: updatedPost.likes, // Return updated likes
+                text: "unlike",
+            });
         }
-
-        else {
-            await Post.findByIdAndUpdate(id, { $pull: { likes: userid } })
-            res.status(201).json({ message: "UnLiked successfully", likes: thatPost.likes, text: "unlike" })
-
-        }
-
-
-
     } catch (error) {
-        console.error("Error happened while Liking/unliking controller:", error.message)
-        res.status(500).json({ message: "Internal Server Error" })
-
+        console.error("Error in Liking/Unliking:", error.message);
+        res.status(500).json({ message: "Internal Server Error" });
     }
-}
+};
 
 export const commentOnPost = async (req, res) => {
     try {
@@ -79,13 +95,19 @@ export const commentOnPost = async (req, res) => {
 
         const id = req.params.id
 
-        await Post.findByIdAndUpdate(id, { $push: { comments: { text, user: userId } } })
-        res.status(200).json({ message: "Commented successfully" })
+        const updatedPost = await Post.findByIdAndUpdate(id, { $push: { comments: { text, user: userId } } }, { new: true }).populate({
+            path: "comments",
+            populate: {
+                path: "user",
+                select: "-password"
+            }
+        })
+        res.status(200).json({ message: "Commented successfully", comments: updatedPost.comments })
 
         const newnotification = new Notification({
             type: "comment",
             from: userId,
-            to: id
+            to: updatedPost.user
         })
         await newnotification.save()
     } catch (error) {

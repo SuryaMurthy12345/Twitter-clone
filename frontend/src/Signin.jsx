@@ -1,39 +1,31 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { api } from "./config";
 
-const Signin = () => {
-    const [data, setData] = useState({
-        username: "",
-        password: "",
-    });
+const Signin = ({ setAuth }) => {  // ✅ Receive setAuth as a prop
     const navigate = useNavigate();
-    const [message, setMessage] = useState(""); // State for messages
-
-    const changeHandle = (e) => {
-        setData({ ...data, [e.target.name]: e.target.value });
-    };
+    const [data, setData] = useState({ username: "", password: "" });
+    const [message, setMessage] = useState(""); 
 
     const submitHandle = async (e) => {
-        e.preventDefault(); // Prevent page reload
+        e.preventDefault(); 
 
         try {
             const response = await fetch("http://localhost:8000/api/auth/login", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include", // Required for cookies
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify(data),
             });
 
             const result = await response.json();
             if (response.ok) {
-                setMessage("User Signed successfully.");
-                setTimeout(() => navigate('/dashboard'), 2000)
+                setMessage("User Signed in successfully.");
+                setAuth(true);  // ✅ Updates auth in App.jsx
+                setTimeout(() => navigate('/'), 2000);
             } else {
                 setMessage(result.error || "Signin failed. Try again.");
             }
-
         } catch (err) {
             console.error("Signin Error:", err);
             setMessage("Something went wrong. Please try again.");
@@ -52,7 +44,7 @@ const Signin = () => {
                             name={field}
                             placeholder={`Enter ${field}`}
                             value={data[field]}
-                            onChange={changeHandle}
+                            onChange={(e) => setData({ ...data, [e.target.name]: e.target.value })}
                             className="hover:p-2 p-1 hover:border-b-2 border-gray-400 focus:outline-none"
                         />
                     </div>
@@ -67,7 +59,7 @@ const Signin = () => {
                 {message && <div className="text-red-500 mt-2">{message}</div>}
 
                 <div>
-                    Dont have an account? &nbsp;
+                    Don't have an account? &nbsp;
                     <a href="/signup" className="text-blue-500 hover:underline">
                         Sign up
                     </a>
@@ -78,3 +70,4 @@ const Signin = () => {
 };
 
 export default Signin;
+
