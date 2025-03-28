@@ -1,12 +1,13 @@
 import Notificiation from "../models/notification.model.js"
-import {v2 as cloudinary} from "cloudinary"
 import User from "../models/user.models.js"
-import bcrypt from "bcrypt"
 
 export const getUserProfile = async (req, res) => {
     const { username } = req.params
     try {
-        const user = await User.findOne({ username }).select("-password")
+        const user = await User.findOne({ username })
+        .select("-password")
+        .populate("followers", "username fullName profileImg")
+        .populate("following", "username fullName profileImg");
 
         if (!user) {
             return res.status(404).json({ error: "User not found" })
@@ -40,7 +41,7 @@ export const followUnfollowUser = async (req, res) => {
 
             await User.findByIdAndUpdate(req.user._id, { $pull: { following: id } })
 
-            res.status(200).json({ message: "unfollowed successfully" })
+            res.status(200).json({ message: "unfollowed successfully", text: "Follow" })
         }
         else {
             //follow (wow super logic)
@@ -55,7 +56,7 @@ export const followUnfollowUser = async (req, res) => {
 
             await newnotification.save()
 
-            res.status(200).json({ message: "followed successfully" })
+            res.status(200).json({ message: "followed successfully", text: "Unfollow" })
         }
 
 
@@ -65,79 +66,40 @@ export const followUnfollowUser = async (req, res) => {
     }
 }
 
-export const getSuggestedUsers = async(req,res)=>{
+export const getSuggestedUsers = async (req, res) => {
     try {
         const userId = req.user._id
         const usersFollowedByMe = await User.findById(userId).select("following")
 
         const users = await User.aggregate([
             {
-                $match:{
-                    _id:{$ne:userId}
+                $match: {
+                    _id: { $ne: userId }
                 }
             },
-            {$sample:{size:10}}
-        ]) 
+            { $sample: { size: 10 } }
+        ])
 
-        const filteredUsers = users.filter(user=>!usersFollowedByMe.following.includes(user._id)) 
+        const filteredUsers = users.filter(user => !usersFollowedByMe.following.includes(user._id))
 
-        const suggestedUsers=filteredUsers.slice(0,9) 
+        const suggestedUsers = filteredUsers.slice(0, 9)
 
         res.status(200).json(suggestedUsers)
     } catch (error) {
-        
+
     }
 }
 export const updateUser = async (req, res) => {
-    const { fullName, username, bio, link, email, currentPassword, newPassword } = req.body;
+    const { fullName, username, bio, link, email } = req.body;
     let { profileImg, coverImg } = req.body;
 
     const userId = req.user._id;
 
     try {
-        // Fetch the user WITH password field for password validation
         let user = await User.findById(userId).select("+password");
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
-
-        // Validate password update only if provided
-        if ((currentPassword && !newPassword) || (!currentPassword && newPassword)) {
-            return res.status(400).json({ error: "Please provide both current and new password" });
-        }
-
-        if (newPassword && newPassword.length < 6) {
-            return res.status(400).json({ error: "Password length should be at least 6 characters" });
-        }
-
-        if (newPassword) {
-            const match = await bcrypt.compare(currentPassword, user.password);
-            if (!match) {
-                return res.status(400).json({ error: "Current password is incorrect" });
-            }
-
-            const salt = await bcrypt.genSalt(10);
-            user.password = await bcrypt.hash(newPassword, salt);
-        }
-
-        // Handle profile image update
-        if (profileImg) {
-            if (user.profileImg) {
-                await cloudinary.uploader.destroy(user.profileImg.match(/upload\/(.*?).png/)[1]);
-            }
-            const uploaded = await cloudinary.uploader.upload(profileImg);
-            profileImg = uploaded.secure_url;
-        }
-
-        // Handle cover image update
-        if (coverImg) {
-            if (user.coverImg) {
-                await cloudinary.uploader.destroy(user.coverImg.match(/upload\/(.*?).png/)[1]);
-            }
-            const uploaded = await cloudinary.uploader.upload(coverImg);
-            coverImg = uploaded.secure_url;
-        }
-
         // Update user fields
         user.fullName = fullName || user.fullName;
         user.username = username || user.username;

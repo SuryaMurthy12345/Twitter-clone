@@ -55,13 +55,13 @@ export const login = async (req, res) => {
         const user = await User.findOne({ username });
 
         if (!user) {
-            return res.status(400).json({ error: "Invalid Credentials" });
+            return res.status(400).json({ error: "Username incorrect" });
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
         if (!isPasswordCorrect) {
-            return res.status(400).json({ error: "Invalid Credentials" });
+            return res.status(400).json({ error: "password incorrect" });
         }
 
         generateTokenAndSetCookie(user._id, user.username, res);
@@ -98,7 +98,7 @@ export const logout = async (req, res) => {
     }
 };
 
-export const getMe = async (req, res) => { 
+export const getMe = async (req, res) => {
     try {
         if (!req.user || !req.user._id) {
             return res.status(401).json({ error: "Unauthorized" });
@@ -110,10 +110,33 @@ export const getMe = async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        res.status(200).json(user);
+        res.status(200).json({ user, username: user.username });
 
     } catch (error) {
         console.error("Error in getMe controller: ", error.message);
         res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
+export const forgotPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+
+        const user = await User.findOne({ email })
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        if (newPassword && newPassword.length < 6) {
+            return res.status(400).json({ error: "Password length should be at least 6 characters" });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        await user.save();
+
+        res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+        console.error("Error in forgotPassword controller: ", error.message);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}

@@ -127,9 +127,23 @@ export const getCommentsOFPost = async (req, res) => {
             }
         })
         const allcomments = post.comments
-        res.status(200).json(allcomments)
+        res.status(200).json({ allcomments, presentuserid: req.user._id })
     } catch (error) {
         console.error("Error in getCommentsOFPost Handler:", error.message)
+        res.status(500).json({ error: "Internal Server Error" })
+    }
+}
+
+export const deleteComment = async (req, res) => {
+    try {
+        const commentid = req.params.id
+        const { postid } = req.body
+
+        const updatedpost = await Post.findByIdAndUpdate(postid, { $pull: { comments: {_id: commentid} } }, { new: true })
+
+        res.status(201).json({ message: "comment deleted Succesfully", comments: updatedpost.comments })
+    } catch (error) {
+        console.error("Error in commentdelete Handler:", error.message)
         res.status(500).json({ error: "Internal Server Error" })
     }
 }

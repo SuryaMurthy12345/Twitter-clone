@@ -22,7 +22,7 @@ export const likesHandle = async (postId, setPosts) => {
     }
 };
 
-export const commentHandle = async (postId, setPostid, setOpenPostId, setComments, openPostId) => {
+export const commentHandle = async (postId, setPostid, setOpenPostId, setComments, openPostId, setPresentUser) => {
     if (openPostId === postId) {
         setOpenPostId(null);
         return;
@@ -36,8 +36,11 @@ export const commentHandle = async (postId, setPostid, setOpenPostId, setComment
         });
         const result = await response.json();
         if (response.ok) {
+            8
             console.log("Comments fetched successfully");
-            setComments(result);
+            console.log(result)
+            setComments(result.allcomments);
+            setPresentUser(result.presentuserid)
         } else {
             console.log("Error", result.error);
         }
@@ -75,3 +78,33 @@ export const commentSubmitHandle = async (postid, text, setText, setComments, se
         console.log("Error", error);
     }
 };
+
+export const deleteCommentHandle = async (commentid, postid, setPosts) => {
+    console.log(commentid, postid)
+    try {
+        const response = await fetch(`${api}/api/posts/deletecomment/${commentid}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include",
+            body: JSON.stringify({ postid })
+        })
+        const result = await response.json()
+        if (response.ok) {
+            alert("comment deleted, again open comments to see your comment is deleted-")
+            setPosts((prevposts) =>
+                prevposts.map((post) =>
+                    post._id === postid ? { ...post, comments: result.comments || [] } : post
+                )
+            );
+        }
+        else {
+            console.log("Error", result.error)
+        }
+
+    } catch (error) {
+        console.log("Error", error);
+    }
+}
+

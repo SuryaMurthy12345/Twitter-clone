@@ -5,6 +5,7 @@ import Signup from './Signup';
 import { api } from './config';
 
 import Dashboard from './DashboardPages/Dashboard';
+import Forgotpassword from './Forgotpassword';
 import Notification from './SidebarPages/Notification';
 import Profile from './SidebarPages/Profile';
 
@@ -39,6 +40,7 @@ const App = () => {
       <Routes>
         <Route path='/signup' element={<Signup setAuth={setAuth} />} /> {/* ✅ Pass setAuth */}
         <Route path='/signin' element={<Signin setAuth={setAuth} />} /> {/* ✅ Pass setAuth */}
+        <Route path='/forgot' element={<Forgotpassword />} />
         <Route path='/notification' element={<Notification />} />
         <Route path='/profile' element={<Profile />} />
 

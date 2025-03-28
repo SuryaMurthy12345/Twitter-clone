@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../config";
 import Createpost from "./Createpost";
-import { commentHandle, commentSubmitHandle, likesHandle } from "./Helpful";
+import { commentHandle, commentSubmitHandle, deleteCommentHandle, likesHandle } from "./Helpful";
 
 const Foryou = () => {
     const [posts, setPosts] = useState([]);
@@ -10,6 +10,7 @@ const Foryou = () => {
     const [comments, setComments] = useState([]);
     const [openPostId, setOpenPostId] = useState(null); // Tracks which post's comments are open  
 
+    const [presentuser, setPresentUser] = useState("")
     const fetchPosts = async () => {
         try {
             const response = await fetch(`${api}/api/posts`, {
@@ -20,6 +21,7 @@ const Foryou = () => {
             if (response.ok) {
                 console.log("Posts fetched successfully");
                 setPosts(result);
+
             } else {
                 console.log("Error", result.error);
             }
@@ -68,7 +70,7 @@ const Foryou = () => {
 
                                 <button
                                     className="flex items-center gap-2 text-gray-600 px-4 py-2 rounded-lg shadow-md border border-gray-300 transition-all duration-300 hover:bg-gray-100 hover:scale-105 cursor-pointer"
-                                    onClick={() => commentHandle(post._id, setPostid, setOpenPostId, setComments, openPostId)}
+                                    onClick={() => commentHandle(post._id, setPostid, setOpenPostId, setComments, openPostId, setPresentUser)}
                                 >
                                     <span>💬</span>
                                     <span className="font-semibold">Comments:</span>
@@ -83,7 +85,14 @@ const Foryou = () => {
                                         {comments.length > 0 ? (
                                             comments.map((comment) => (
                                                 <div key={comment._id} className="border-b p-2">
-                                                    <h2 className="font-bold">@{comment.user.username}</h2>
+                                                    {comment.user._id === presentuser ? (
+                                                        <div className="flex flex-row justify-between m-2">
+                                                            <h2 className="font-bold">@{comment.user.username}</h2>
+                                                            <button className="text-white bg-red-400 hover:border hover:rounded-lg p-2" onClick={() => deleteCommentHandle(comment._id, openPostId, setPosts)} >Delete🚮</button>
+                                                        </div>
+                                                    ) : (<h2 className="font-bold">@{comment.user.username}</h2>
+                                                    )
+                                                    }
                                                     <p className="text-gray-700">{comment.text}</p>
                                                 </div>
                                             ))
@@ -113,6 +122,7 @@ const Foryou = () => {
                     <div className="text-center text-gray-500">No Posts Found</div>
                 )}
             </div>
+
         </div>
     );
 };

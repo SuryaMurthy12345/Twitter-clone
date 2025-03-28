@@ -5,13 +5,13 @@ import { api } from "./config";
 const Signin = ({ setAuth }) => {  // ✅ Receive setAuth as a prop
     const navigate = useNavigate();
     const [data, setData] = useState({ username: "", password: "" });
-    const [message, setMessage] = useState(""); 
+    const [message, setMessage] = useState("");
 
     const submitHandle = async (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
 
         try {
-            const response = await fetch("http://localhost:8000/api/auth/login", {
+            const response = await fetch(`${api}/api/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -62,6 +62,11 @@ const Signin = ({ setAuth }) => {  // ✅ Receive setAuth as a prop
                     Don't have an account? &nbsp;
                     <a href="/signup" className="text-blue-500 hover:underline">
                         Sign up
+                    </a>
+                </div>
+                <div>
+                    <a href="/forgot" className="text-blue-500 hover:underline">
+                        Forgot Password
                     </a>
                 </div>
             </form>

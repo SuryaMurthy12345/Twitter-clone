@@ -75,6 +75,40 @@ app.post("/upload", upload.single("image"), async (req, res) => {
 })
 
 
+
+app.post("/upload/profile", upload.array("image", 2), async (req, res) => {
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ error: "No files uploaded" });
+        }
+
+        const uploadPromises = req.files.map((file) => {
+            return new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    { folder: "profileImages" },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+                streamifier.createReadStream(file.buffer).pipe(uploadStream);
+            });
+        });
+
+        const results = await Promise.all(uploadPromises);
+        const imageUrls = results.map((result) => result.secure_url);
+
+        res.json(imageUrls
+        );
+
+    } catch (err) {
+        console.error("Upload Error:", err);
+        res.status(500).json({ error: "Image upload failed" });
+    }
+});
+
+
+
 const port = process.env.port || 8000
 app.listen(port, () => {
     connectDB()
