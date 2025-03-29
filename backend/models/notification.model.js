@@ -18,6 +18,11 @@ const notificationSchema = new mongoose.Schema({
         required:true,
         enum:['follow','like','comment']
     },
+    toModel: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        enum: ['User', 'Post']  // The model name to reference dynamically
+    },
     read:{
         type:Boolean,
         default:false

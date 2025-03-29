@@ -45,7 +45,7 @@ const Profile = () => {
     } catch (error) {
       console.log("Error:", error);
     }
-  };
+  }
 
   const verifyUser = () => {
     fetch(`${api}/api/auth/me`, {

@@ -9,6 +9,7 @@ import Forgotpassword from './Forgotpassword';
 import Notification from './SidebarPages/Notification';
 import Profile from './SidebarPages/Profile';
 import Userprofile from './Userprofile';
+import Onepost from './Onepost';
 
 const App = () => {
   const [auth, setAuth] = useState(null); // ✅ Prevents flashing
@@ -44,6 +45,7 @@ const App = () => {
         <Route path='/forgot' element={<Forgotpassword />} />
         <Route path='/notification' element={<Notification />} />
         <Route path='/profile' element={<Profile />} />
+        <Route path='/post/:id' element={<Onepost/>} />
         <Route path='/userprofile/:username/:text' element={<Userprofile />} />
 
         <Route path='/dashboard' element={auth ? <Dashboard /> : <Navigate to='/signin' />} />

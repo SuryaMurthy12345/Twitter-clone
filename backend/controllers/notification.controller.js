@@ -7,7 +7,7 @@ export const getAllNotifications = async (req, res) => {
         const allnotifications = await Notification.find({ to: req.user._id }).populate({
             path: "from",
             select: "username profileImg"
-        });
+        }).sort({ createdAt: -1 })
 
         if (allnotifications.length === 0) {
             return res.status(404).json({ error: "No notifications found" });
@@ -28,7 +28,7 @@ export const getAllNotifications = async (req, res) => {
 
 export const deleteNotifications = async (req, res) => {
     try {
-        const notification = await Notification.deleteMany({ to: req.user._id }, { new: true });
+        const notification = await Notification.deleteMany({ to: req.user._id }, { new: true })
         res.status(200).json({ message: "All notifications deleted" });
     } catch (error) {
         console.error("Error in deleteNotifications Handler:", error.message);

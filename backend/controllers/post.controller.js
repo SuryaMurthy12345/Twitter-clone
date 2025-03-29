@@ -55,13 +55,15 @@ export const likeUnlikePost = async (req, res) => {
                 { $push: { likes: userid } },
                 { new: true } // Returns the updated document
             );
-
-            const newNotification = new Notification({
-                type: "like",
-                from: userid,
-                to: thatPost.user,
-            });
-            await newNotification.save();
+            if (thatPost.user._id.toString() !== userid.toString()) {
+                const newNotification = new Notification({
+                    type: "like",
+                    from: userid,
+                    to: thatPost.user._id,
+                    toModel: thatPost._id
+                });
+                await newNotification.save();
+            }
 
             return res.status(201).json({
                 message: "Liked successfully",
@@ -103,13 +105,15 @@ export const commentOnPost = async (req, res) => {
             }
         })
         res.status(200).json({ message: "Commented successfully", comments: updatedPost.comments })
-
-        const newnotification = new Notification({
-            type: "comment",
-            from: userId,
-            to: updatedPost.user
-        })
-        await newnotification.save()
+        if (updatedPost.user._id.toString() !== userId.toString()) {
+            const newnotification = new Notification({
+                type: "comment",
+                from: userId,
+                to: updatedPost.user._id,
+                toModel: updatedPost._id
+            })
+            await newnotification.save()
+        }
     } catch (error) {
         console.error("Error in Comment Handler:", error.message)
         res.status(500).json({ error: "Internal Server Error" })
@@ -218,6 +222,26 @@ export const userPosts = async (req, res) => {
         res.status(200).json(posts)
     } catch (error) {
         console.error("Error in userPosts Handler:", error.message)
+        res.status(500).json({ error: "Internal Server Error" })
+    }
+}
+
+export const onePost = async (req, res) => {
+    try {
+        const { id } = req.params
+        const post = await Post.findById(id).populate({
+            path: "user",
+            select: "-password"
+        }).populate({
+            path: "comments.user",
+            select: "-password"
+        }).populate({
+            path: "likes",
+            select: "-password"
+        })
+        res.status(200).json(post)
+    } catch (error) {
+        console.error("Error in userSinglePost Handler:", error.message)
         res.status(500).json({ error: "Internal Server Error" })
     }
 }

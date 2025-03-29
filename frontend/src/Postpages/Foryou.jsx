@@ -110,16 +110,18 @@ const Foryou = () => {
                                     <div className="max-h-[200px] overflow-y-auto border p-2 rounded-lg bg-white">
                                         {comments.length > 0 ? (
                                             comments.map((comment) => (
-                                                <div key={comment._id} className="border-b p-2 flex gap-3 items-center hover:cursor-pointer" onClick={() => { comment.user._id === presentuser ? (navigate('/profile')) : (navigateHandle(comment.user.username, comment.user._id)) }}>
+                                                <div key={comment._id} className="border-b p-2 flex gap-3 items-center hover:cursor-pointer">
                                                     {/* User Profile Image */}
-                                                    <img
-                                                        className="w-8 h-8 rounded-full object-cover border border-gray-300"
-                                                        src={comment.user.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"}
-                                                        alt="Profile"
-                                                    />
-                                                    <div className="flex flex-col w-full">
-                                                        <h2 className="font-bold text-sm">@{comment.user.username}</h2>
-                                                        <p className="text-gray-700 text-sm">{comment.text}</p>
+                                                    <div onClick={() => { comment.user._id === presentuser ? (navigate('/profile')) : (navigateHandle(comment.user.username, comment.user._id)) }} className="flex gap-3 items-center cursor-pointer">
+                                                        <img
+                                                            className="w-8 h-8 rounded-full object-cover border border-gray-300"
+                                                            src={comment.user.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"}
+                                                            alt="Profile"
+                                                        />
+                                                        <div className="flex flex-col w-full">
+                                                            <h2 className="font-bold text-sm">@{comment.user.username}</h2>
+                                                            <p className="text-gray-700 text-sm">{comment.text}</p>
+                                                        </div>
                                                     </div>
 
                                                     {/* Delete Button (Only for the comment owner) */}
