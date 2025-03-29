@@ -6,6 +6,8 @@ const Followsuggestions = () => {
     const [users, setUsers] = useState([]);
     const navigate = useNavigate()
 
+    const [showbutton, setShowbutton] = useState(false)
+
     const suggestHandle = async () => {
         try {
             const response = await fetch(`${api}/api/user/suggested`, {
@@ -15,6 +17,7 @@ const Followsuggestions = () => {
             const result = await response.json();
             if (response.ok) {
                 setUsers(result);
+                setShowbutton(true)
             } else {
                 console.log("Error:", result.error);
             }
@@ -46,10 +49,14 @@ const Followsuggestions = () => {
 
     return (
         <div className="w-full max-w-sm bg-white shadow-lg rounded-xl p-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-3">Who to Follow</h2>
-
+            <div className='flex flex-row justify-between items-center m-2 p-2 '>
+                <h2 className="text-lg font-bold text-gray-900 mb-3">Who to Follow</h2>
+                {
+                    showbutton && <div className='bg-red-400 text-white p-2 border rounded-sm hover:rounded-lg cursor-pointer' onClick={() => { setUsers([]); setShowbutton(false) }}>Cancel</div>
+                }
+            </div>
             <div className="space-y-3">
-                {users.map((user, index) => (
+                {users.length > 0 && users.map((user, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-300 ">
                         <div className="flex items-center w-15 h-10 justify-between px-2 cursor-pointer" onClick={() => navigate(`/userprofile/${user.username}`)}>
                             <img
