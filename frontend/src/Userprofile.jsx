@@ -14,7 +14,9 @@ const Userprofile = () => {
   const [followers, setFollowers] = useState([])
   const [following, setFollowing] = useState([])
 
-  const { username } = useParams()
+  let { username, text } = useParams()
+
+  const [name, setName] = useState(text)
   const getProfile = async (username) => {
     try {
       const response = await fetch(`${api}/api/user/profile/${username}`, {
@@ -32,6 +34,22 @@ const Userprofile = () => {
       console.log("Error:", error);
     }
   };
+
+  const followHandle = async (id) => {
+    try {
+      const response = await fetch(`${api}/api/user/follow/${id}`, {
+        method: 'POST',
+        credentials: "include"
+      })
+      const result = await response.json()
+      if (response.ok) {
+        name == "Unfollow" ? setName("Follow") : name
+        name == "Follow" ? setName("Unfollow") : name
+      }
+    } catch (error) {
+      console.log("Error:", error)
+    }
+  }
 
   useEffect(() => {
     getProfile(username)
@@ -55,13 +73,23 @@ const Userprofile = () => {
               />
             </div>
 
-            {/* Profile Image */}
-            <div className="flex justify-center -mt-1">
+            {/* Profile Image & Follow Button Container */}
+            <div className="flex flex-col items-center ">
               <img
                 src={profile.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"}
                 alt="Profile"
                 className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
               />
+
+              {/* Follow Button Directly Under the Image */}
+              <button
+                onClick={() => followHandle(profile._id)}
+                className="mt-3 bg-blue-500 text-white font-bold border border-blue-600 
+               rounded-md px-4 py-2 hover:bg-blue-600 hover:shadow-md 
+               transition-all flex flex-row items-center justify-center"
+              >
+                {name}
+              </button>
             </div>
 
             {/* User Details */}
@@ -92,6 +120,7 @@ const Userprofile = () => {
                   <div key={index} className="flex items-center space-x-3 my-2 border-b p-2">
                     <div onClick={() => navigate(`/userprofile/${follower.username}`)} >
                       <img className="w-10 h-10 bg-gray-300 rounded-full" src={follower.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"} />
+
                       <h2 className="text-md font-semibold text-gray-900">{follower.username}</h2>
                     </div>
                   </div>

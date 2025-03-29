@@ -22,7 +22,8 @@ const Foryou = () => {
             const result = await response.json();
             if (response.ok) {
                 console.log("Posts fetched successfully");
-                setPosts(result);
+                setPosts(result.allposts);
+                setPresentUser(result.presentuser)
             } else {
                 console.log("Error", result.error);
             }
@@ -30,6 +31,23 @@ const Foryou = () => {
             console.log("Error", error);
         }
     };
+
+    const navigateHandle = async (username, id) => {
+        try {
+            const response = await fetch(`${api}/api/user/check/${id}`, {
+                method: "GET",
+                credentials: "include"
+            })
+            const result = await response.json()
+            if (response.ok) {
+
+                navigate(`/userprofile/${username}/${result.text}`)
+            }
+        } catch (error) {
+            console.log("Error:", error)
+        }
+
+    }
 
     useEffect(() => {
         fetchPosts();
@@ -44,7 +62,7 @@ const Foryou = () => {
                 {posts.length > 0 ? (
                     posts.map((post) => (
                         <div key={post._id} className="border p-4 m-4 rounded-xl shadow-lg bg-white">
-                            <div className="flex flex-row p-2 cursor-pointer" >
+                            <div className="flex flex-row p-2 cursor-pointer" onClick={() => { post.user._id === presentuser ? (navigate('/profile')) : (navigateHandle(post.user.username, post.user._id)) }} >
                                 <img
                                     className="w-10 h-10 rounded-full object-cover border border-gray-300"
                                     src={post.user.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"}
@@ -92,7 +110,7 @@ const Foryou = () => {
                                     <div className="max-h-[200px] overflow-y-auto border p-2 rounded-lg bg-white">
                                         {comments.length > 0 ? (
                                             comments.map((comment) => (
-                                                <div key={comment._id} className="border-b p-2 flex gap-3 items-center hover:cursor-pointer" onClick={() => navigate(`/userprofile/${comment.user.username}`)}>
+                                                <div key={comment._id} className="border-b p-2 flex gap-3 items-center hover:cursor-pointer" onClick={() => { comment.user._id === presentuser ? (navigate('/profile')) : (navigateHandle(comment.user.username, comment.user._id)) }}>
                                                     {/* User Profile Image */}
                                                     <img
                                                         className="w-8 h-8 rounded-full object-cover border border-gray-300"

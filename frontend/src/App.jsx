@@ -44,7 +44,7 @@ const App = () => {
         <Route path='/forgot' element={<Forgotpassword />} />
         <Route path='/notification' element={<Notification />} />
         <Route path='/profile' element={<Profile />} />
-        <Route path='/userprofile/:username' element={<Userprofile/>} />
+        <Route path='/userprofile/:username/:text' element={<Userprofile />} />
 
         <Route path='/dashboard' element={auth ? <Dashboard /> : <Navigate to='/signin' />} />
         <Route path='/' element={auth ? <Navigate to='/dashboard' /> : <Navigate to='/signin' />} />

@@ -119,3 +119,22 @@ export const updateUser = async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
+export const CheckFollowORUnfollow = async(req,res)=>{
+    try {
+        const userid = req.user._id 
+        const personid = req.params.id 
+
+        const user = await User.findById(userid) 
+
+        let follow = user.following.includes(personid) 
+        let text=""
+        follow ? text="Unfollow" : text="Follow" 
+        
+        res.status(200).json({text})
+    } catch (error) {
+        console.error("Error in Check controller: ", error.message);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+

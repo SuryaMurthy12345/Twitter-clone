@@ -36,7 +36,6 @@ export const commentHandle = async (postId, setPostid, setOpenPostId, setComment
         });
         const result = await response.json();
         if (response.ok) {
-            8
             console.log("Comments fetched successfully");
             console.log(result)
             setComments(result.allcomments);
@@ -107,4 +106,6 @@ export const deleteCommentHandle = async (commentid, postid, setPosts) => {
         console.log("Error", error);
     }
 }
+
+
 

@@ -139,7 +139,7 @@ export const deleteComment = async (req, res) => {
         const commentid = req.params.id
         const { postid } = req.body
 
-        const updatedpost = await Post.findByIdAndUpdate(postid, { $pull: { comments: {_id: commentid} } }, { new: true })
+        const updatedpost = await Post.findByIdAndUpdate(postid, { $pull: { comments: { _id: commentid } } }, { new: true })
 
         res.status(201).json({ message: "comment deleted Succesfully", comments: updatedpost.comments })
     } catch (error) {
@@ -164,7 +164,7 @@ export const allPosts = async (req, res) => {
         if (allposts.length === 0) {
             res.json({ message: "No Posts Found" })
         }
-        res.status(200).json(allposts)
+        res.status(200).json({ allposts, presentuser: req.user._id })
     } catch (error) {
         console.error("Error in allPosts Handler:", error.message)
         res.status(500).json({ error: "Internal Server Error" })

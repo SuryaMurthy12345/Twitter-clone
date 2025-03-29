@@ -58,7 +58,7 @@ const Followsuggestions = () => {
             <div className="space-y-3">
                 {users.length > 0 && users.map((user, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-300 ">
-                        <div className="flex items-center w-15 h-10 justify-between px-2 cursor-pointer" onClick={() => navigate(`/userprofile/${user.username}`)}>
+                        <div className="flex items-center w-15 h-10 justify-between px-2 cursor-pointer" onClick={() => navigate(`/userprofile/${user.username}/Follow`)}>
                             <img
                                 className="w-10 h-10 rounded-full object-cover border border-gray-300"
                                 src={user.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"}
