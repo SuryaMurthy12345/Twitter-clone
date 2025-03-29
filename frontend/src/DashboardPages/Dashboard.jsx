@@ -41,11 +41,12 @@ const Dashboard = () => {
             </div>
 
             {/* Follow Suggestions (Right Sidebar) */}
-            <div className="w-0 lg:w-1/4 hidden lg:flex flex-col p-4">
-                <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200">
+            <div className="w-0 lg:w-1/3 hidden lg:flex flex-col p-4 ">
+                <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200 h-1/2 overflow-y-auto">
                     <Followsuggestions />
                 </div>
             </div>
+
         </div>
     );
 };

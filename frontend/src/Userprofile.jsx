@@ -1,34 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { api } from "../config";
-import Sidebar from "../DashboardPages/Sidebar";
+import { useNavigate, useParams } from "react-router-dom";
+import Sidebar from "./DashboardPages/Sidebar";
+import { api } from "./config";
 
-const Profile = () => {
+const Userprofile = () => {
   const [profile, setProfile] = useState(null);
-  const [showForm, setShowForm] = useState(false); // Controls form visibility 
+
   const [showtable, setShowtable] = useState(false); // Controls form visibility 
   const [showfollowingtable, setShowFollowingtable] = useState(false); // Controls form visibility 
-  const [loading, setLoading] = useState(false)
+
   const navigate = useNavigate()
-  const [data, setData] = useState({
-    fullName: "", username: "", bio: "", link: "", email: "", profileImg: "", coverImg: ""
-  });
 
   const [followers, setFollowers] = useState([])
   const [following, setFollowing] = useState([])
 
-  const changeHandle = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-  };
-
-  const handleFileChange = (e, type) => {
-    if (type === "profileImg") {
-      setData({ ...data, profileImg: e.target.files[0] });
-    } else if (type === "coverImg") {
-      setData({ ...data, coverImg: e.target.files[0] });
-    }
-  };
-
+  const { username } = useParams()
   const getProfile = async (username) => {
     try {
       const response = await fetch(`${api}/api/user/profile/${username}`, {
@@ -47,88 +33,9 @@ const Profile = () => {
     }
   };
 
-  const verifyUser = () => {
-    fetch(`${api}/api/auth/me`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        getProfile(data.username);
-      })
-      .catch((error) => {
-        console.error("Verify Error:", error);
-      });
-  };
-
   useEffect(() => {
-    verifyUser();
-  }, []);
-
-  const submitHandle = async (e) => {
-    e.preventDefault();
-    setLoading(true)
-    let updatedData = ""
-
-    // Create FormData and append the selected images
-    const formData = new FormData();
-    if (data.profileImg) formData.append("image", data.profileImg);
-    if (data.coverImg) formData.append("image", data.coverImg);
-
-    try {
-      // Upload images first
-      const response = await fetch(`${api}/upload/profile`, {
-        method: "POST",
-        body: formData
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-
-        updatedData = {
-          ...data,
-          profileImg: result[0] || "",
-          coverImg: result[1] || ""
-        };
-        console.log(profile)
-      } else {
-        console.log("Image Upload Error:", result.error);
-        return;
-      }
-    } catch (error) {
-      console.log("Error uploading images", error);
-      setLoading(false)
-      return;
-    }
-
-    try {
-      // Update user profile after successful image upload
-      const response = await fetch(`${api}/api/user/update`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedData),
-        credentials: "include"
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        console.log("Profile updated:", result);
-        setProfile(prevProfile => ({ ...prevProfile, ...result }));
-        setShowForm(false);
-      } else {
-        console.log("Profile Update Error:", result.error);
-      }
-    } catch (error) {
-      console.error("Update Error:", error);
-    }
-    setLoading(false)
-  };
-
+    getProfile(username)
+  }, [username]);
 
   return (
     <div className="flex flex-row h-screen bg-gray-100">
@@ -210,37 +117,8 @@ const Profile = () => {
           <h1 className="text-center text-gray-600 text-xl animate-pulse">Loading...</h1>
         )}
       </div>
-
-      {/* Update Button */}
-      <div className="absolute top-10 right-10">
-        <button
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-700"
-          onClick={() => setShowForm(!showForm)}
-        >
-          Update your profile
-        </button>
-
-        {/* Form (Visible only if showForm is true) */}
-        {showForm && (
-          <div className="mt-4 p-6 bg-white shadow-lg rounded-lg absolute right-0">
-            <form onSubmit={submitHandle} className="flex flex-col gap-3">
-              <input type='text' name='fullName' placeholder='Full Name' onChange={changeHandle} value={data.fullName} className="p-2 border rounded" />
-              <input type='text' name='username' placeholder='Username' onChange={changeHandle} value={data.username} className="p-2 border rounded" />
-              <input type='text' name='bio' placeholder='Bio' onChange={changeHandle} value={data.bio} className="p-2 border rounded" />
-              <input type='text' name='link' placeholder='Link' onChange={changeHandle} value={data.link} className="p-2 border rounded" />
-              <input type='email' name='email' placeholder='Email' onChange={changeHandle} value={data.email} className="p-2 border rounded" />
-              <label>Upload Profile Image</label>
-              <input type="file" accept="image/*" placeholder="upload profile image" onChange={(e) => handleFileChange(e, "profileImg")} />
-              <label>Upload Cover Image</label>
-              <input type="file" accept="image/*" placeholder="upload cover image" onChange={(e) => handleFileChange(e, "coverImg")} />
-
-              <input type='submit' value={loading ? "Loading..." : "Update"} className="bg-green-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-green-700" />
-            </form>
-          </div>
-        )}
-      </div>
     </div>
   );
 };
 
-export default Profile;
+export default Userprofile;

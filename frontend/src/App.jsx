@@ -8,6 +8,7 @@ import Dashboard from './DashboardPages/Dashboard';
 import Forgotpassword from './Forgotpassword';
 import Notification from './SidebarPages/Notification';
 import Profile from './SidebarPages/Profile';
+import Userprofile from './Userprofile';
 
 const App = () => {
   const [auth, setAuth] = useState(null); // ✅ Prevents flashing
@@ -43,6 +44,7 @@ const App = () => {
         <Route path='/forgot' element={<Forgotpassword />} />
         <Route path='/notification' element={<Notification />} />
         <Route path='/profile' element={<Profile />} />
+        <Route path='/userprofile/:username' element={<Userprofile/>} />
 
         <Route path='/dashboard' element={auth ? <Dashboard /> : <Navigate to='/signin' />} />
         <Route path='/' element={auth ? <Navigate to='/dashboard' /> : <Navigate to='/signin' />} />

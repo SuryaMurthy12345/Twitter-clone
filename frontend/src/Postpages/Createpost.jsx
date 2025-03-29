@@ -45,6 +45,7 @@ const Createpost = () => {
             const result = await response.json()
             if (response.ok) {
                 console.log("Post created:", result)
+                alert("Post created successfully!")
                 setText("")
                 setFile(null)
             } else {

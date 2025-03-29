@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../config";
 import Createpost from "./Createpost";
 import { commentHandle, commentSubmitHandle, deleteCommentHandle, likesHandle } from "./Helpful";
@@ -9,8 +10,9 @@ const Foryou = () => {
     const [text, setText] = useState("");
     const [comments, setComments] = useState([]);
     const [openPostId, setOpenPostId] = useState(null); // Tracks which post's comments are open  
+    const [presentuser, setPresentUser] = useState("");
+    const navigate = useNavigate()
 
-    const [presentuser, setPresentUser] = useState("")
     const fetchPosts = async () => {
         try {
             const response = await fetch(`${api}/api/posts`, {
@@ -21,7 +23,6 @@ const Foryou = () => {
             if (response.ok) {
                 console.log("Posts fetched successfully");
                 setPosts(result);
-
             } else {
                 console.log("Error", result.error);
             }
@@ -43,7 +44,14 @@ const Foryou = () => {
                 {posts.length > 0 ? (
                     posts.map((post) => (
                         <div key={post._id} className="border p-4 m-4 rounded-xl shadow-lg bg-white">
-                            <h2 className="font-bold text-xl mb-2">@{post.user.username}</h2>
+                            <div className="flex flex-row p-2 cursor-pointer" >
+                                <img
+                                    className="w-10 h-10 rounded-full object-cover border border-gray-300"
+                                    src={post.user.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"}
+                                    alt="Profile"
+                                />
+                                <h2 className="font-bold text-xl mb-2 m-2">@{post.user.username}</h2>
+                            </div>
                             <p className="font-black p-2 text-lg">{post.text}</p>
 
                             {/* Image Section */}
@@ -84,16 +92,27 @@ const Foryou = () => {
                                     <div className="max-h-[200px] overflow-y-auto border p-2 rounded-lg bg-white">
                                         {comments.length > 0 ? (
                                             comments.map((comment) => (
-                                                <div key={comment._id} className="border-b p-2">
-                                                    {comment.user._id === presentuser ? (
-                                                        <div className="flex flex-row justify-between m-2">
-                                                            <h2 className="font-bold">@{comment.user.username}</h2>
-                                                            <button className="text-white bg-red-400 hover:border hover:rounded-lg p-2" onClick={() => deleteCommentHandle(comment._id, openPostId, setPosts)} >Delete🚮</button>
-                                                        </div>
-                                                    ) : (<h2 className="font-bold">@{comment.user.username}</h2>
-                                                    )
-                                                    }
-                                                    <p className="text-gray-700">{comment.text}</p>
+                                                <div key={comment._id} className="border-b p-2 flex gap-3 items-center hover:cursor-pointer" onClick={() => navigate(`/userprofile/${comment.user.username}`)}>
+                                                    {/* User Profile Image */}
+                                                    <img
+                                                        className="w-8 h-8 rounded-full object-cover border border-gray-300"
+                                                        src={comment.user.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"}
+                                                        alt="Profile"
+                                                    />
+                                                    <div className="flex flex-col w-full">
+                                                        <h2 className="font-bold text-sm">@{comment.user.username}</h2>
+                                                        <p className="text-gray-700 text-sm">{comment.text}</p>
+                                                    </div>
+
+                                                    {/* Delete Button (Only for the comment owner) */}
+                                                    {comment.user._id === presentuser && (
+                                                        <button
+                                                            className="text-white bg-red-400 px-3 py-1 text-sm rounded-md hover:bg-red-500 transition"
+                                                            onClick={() => deleteCommentHandle(comment._id, openPostId, setPosts)}
+                                                        >
+                                                            🚮 Delete
+                                                        </button>
+                                                    )}
                                                 </div>
                                             ))
                                         ) : (
@@ -122,7 +141,6 @@ const Foryou = () => {
                     <div className="text-center text-gray-500">No Posts Found</div>
                 )}
             </div>
-
         </div>
     );
 };
