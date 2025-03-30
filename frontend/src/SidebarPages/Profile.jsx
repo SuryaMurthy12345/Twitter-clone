@@ -162,6 +162,7 @@ const Profile = () => {
         credentials: "include"
       })
       const result = await response.json()
+
       if (response.ok) {
 
         navigate(`/userprofile/${username}/${result.text}`)

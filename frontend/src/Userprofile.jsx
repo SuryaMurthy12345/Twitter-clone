@@ -55,6 +55,24 @@ const Userprofile = () => {
     getProfile(username)
   }, [username]);
 
+  const navigateHandle = async (username, id) => {
+    try {
+      const response = await fetch(`${api}/api/user/check/${id}`, {
+        method: "GET",
+        credentials: "include"
+      })
+      const result = await response.json()
+      console.log(result.text)
+      if (response.ok) {
+
+        navigate(`/userprofile/${username}/${result.text}`)
+      }
+    } catch (error) {
+      console.log("Error:", error)
+    }
+
+  }
+
   return (
     <div className="flex flex-row h-screen bg-gray-100">
       {/* Sidebar */}
@@ -118,7 +136,7 @@ const Userprofile = () => {
                 <p className="text-gray-500">Followers</p>
                 {showtable && (followers.length > 0 && followers.map((follower, index) => (
                   <div key={index} className="flex items-center space-x-3 my-2 border-b p-2">
-                    <div onClick={() => navigate(`/userprofile/${follower.username}`)} >
+                    <div onClick={() => navigateHandle(follower.username, follower._id)}  >
                       <img className="w-10 h-10 bg-gray-300 rounded-full" src={follower.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"} />
 
                       <h2 className="text-md font-semibold text-gray-900">{follower.username}</h2>
@@ -133,7 +151,7 @@ const Userprofile = () => {
                 <p className="text-gray-500">Following</p>
                 {showfollowingtable && following.length > 0 && following.map((follow, index) => (
                   <div key={index} className="flex items-center space-x-3 my-2 border-b p-2">
-                    <div onClick={() => navigate(`/userprofile/${follow.username}`)} >
+                    <div onClick={() => navigateHandle(follow.username, follow._id)} >
                       <img className="w-10 h-10 bg-gray-300 rounded-full" src={follow.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"} />
                       <h2 className="text-md font-semibold text-gray-900">{follow.username}</h2>
                     </div>
