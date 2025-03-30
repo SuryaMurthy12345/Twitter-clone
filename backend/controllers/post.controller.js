@@ -28,7 +28,9 @@ export const deletePost = async (req, res) => {
         const { id } = req.params
 
         await Post.findByIdAndDelete(id)
-        res.status(200).json({ message: "Post deleted successfully" })
+
+        const newposts = await Post.find()
+        res.status(200).json({ message: "Post deleted successfully", posts: newposts })
     } catch (error) {
         console.error("Error in deletePost controller: ", error.message)
         res.status(500).json({ error: "Internal Server Error" })

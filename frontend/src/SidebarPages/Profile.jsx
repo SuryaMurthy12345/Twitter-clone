@@ -9,6 +9,9 @@ const Profile = () => {
   const [showtable, setShowtable] = useState(false); // Controls form visibility 
   const [showfollowingtable, setShowFollowingtable] = useState(false); // Controls form visibility 
   const [loading, setLoading] = useState(false)
+
+  const [MyPosts, setMyPosts] = useState([])
+  const [posts, showPosts] = useState(false)
   const navigate = useNavigate()
   const [data, setData] = useState({
     fullName: "", username: "", bio: "", link: "", email: "", profileImg: "", coverImg: ""
@@ -173,6 +176,38 @@ const Profile = () => {
 
   }
 
+  const myposts = async (username) => {
+    try {
+      const response = await fetch(`${api}/api/posts/user/${username}`, {
+        method: "GET",
+        credentials: "include"
+      })
+      const result = await response.json()
+      if (response.ok) {
+        setMyPosts(result)
+      }
+    } catch (error) {
+      console.log("Error:", error)
+    }
+  }
+
+  const deletePost = async (id) => {
+    try {
+      const response = await fetch(`${api}/api/posts/delete/${id}`, {
+        method: "DELETE",
+        credentials: "include"
+      })
+      const result = await response.json()
+      if (response.ok) {
+        alert("POST Deleted Successfully.. Again open posts button")
+        showPosts(result.posts)
+      }
+
+    } catch (error) {
+      console.log("ERROR:", error)
+    }
+  }
+
   return (
     <div className="flex flex-row h-screen bg-gray-100">
       {/* Sidebar */}
@@ -252,6 +287,44 @@ const Profile = () => {
         ) : (
           <h1 className="text-center text-gray-600 text-xl animate-pulse">Loading...</h1>
         )}
+        <div>
+          <button onClick={() => { myposts(profile.username); showPosts(!posts) }} className="cursor-pointer bg-blue-500 text-white border hover:rounded-lg p-2 m-2">MyPosts🔥 click on post to see fully.</button>
+          <div className="flex flex-row w-1/2 max-h-100 overflow-y-auto flex-wrap  p-2 m-2">
+          
+            {posts && (MyPosts.length > 0 ? (
+              MyPosts.map((post, index) => (
+                <div className="m-2 p-2 border rounded-lg hover:rounded-2xl w-full" key={index}>
+
+                  <div className="flex flex-row justify-between mx-2 items-center cursor-pointer">
+                    <div className="flex flex-row justify-around  items-center" >
+                      <img
+                        className="w-10 h-10 rounded-full object-cover border border-gray-300 p-2"
+                        src={post.user.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"}
+                        alt="Profile"
+                      />
+                      <h2>{post.user.username}</h2>
+                    </div>
+                    <button className="bg-red-400 text-white border hover:rounded-2xl p-2 m-2 rounded-lg" onClick={() => deletePost(post._id)}>Delete</button>
+                  </div >
+                  {post.text && <p className="font-black p-2 text-lg">{post.text}</p>}
+                  {post.img && (
+                    <div className="w-100 h-100  overflow-hidden rounded-lg object-cover cursor-pointer" onClick={() => navigate(`/post/${post._id}`)}>
+                      <img
+                        src={post.img}
+                        className="w-full h-full object-cover rounded-lg"
+                        alt="Post"
+                      />
+                    </div>
+
+                  )}
+
+                </div>
+
+              ))) : (
+              <h2>No Posts Found....</h2>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Update Button */}

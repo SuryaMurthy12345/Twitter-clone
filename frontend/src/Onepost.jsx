@@ -140,14 +140,17 @@ const Onepost = () => {
             <h2 className="text-lg font-semibold">{post.user.username}</h2>
           </div>
 
+          {post.text && <p className="font-black p-2 text-lg">{post.text}</p>}
+
           {/* Post Image */}
-          <div className="mt-4 w-full max-h-[500px] overflow-hidden rounded-lg">
+          {post.img && (<div className="mt-4 w-full max-h-[500px] overflow-hidden rounded-lg">
             <img
               src={post.img}
               className="w-full h-auto object-cover rounded-lg transition-transform duration-300 hover:scale-105"
               alt="Post"
             />
-          </div>
+          </div>)}
+
 
           {/* Like & Comment Buttons */}
           <div className="flex justify-between mt-4 px-2">
