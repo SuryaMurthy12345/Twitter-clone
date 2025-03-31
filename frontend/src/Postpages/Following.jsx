@@ -4,7 +4,7 @@ import { api } from "../config";
 import Createpost from "./Createpost";
 import { commentHandle, commentSubmitHandle, deleteCommentHandle, likesHandle } from "./Helpful";
 
-const Foryou = () => {
+const Following = () => {
   const [posts, setPosts] = useState([]);
   const [postid, setPostid] = useState("");
   const [text, setText] = useState("");
@@ -21,7 +21,8 @@ const Foryou = () => {
       });
       const result = await response.json();
       if (response.ok) {
-        console.log("Posts fetched successfully");
+        console.log("Posts fetched successfully"); 
+        console.log(result.allposts)
         setPosts(result.allposts);
         setPresentUser(result.presentuser)
       } else {
@@ -165,4 +166,4 @@ const Foryou = () => {
   );
 };
 
-export default Foryou;
+export default Following;

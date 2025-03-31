@@ -202,7 +202,7 @@ export const FollowingPosts = async (req, res) => {
         if (posts.length === 0) {
             return res.json({ message: "No Posts Found" })
         }
-        res.status(200).json(posts)
+        res.status(200).json({ allposts: posts, presentuser: req.user._id })
     } catch (error) {
         console.error("Error in FollowingPosts Handler:", error.message)
         res.status(500).json({ error: "Internal Server Error" })
