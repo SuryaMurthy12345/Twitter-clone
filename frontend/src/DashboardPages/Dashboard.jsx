@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../config';
 import Following from '../Postpages/Following';
 import Foryou from '../Postpages/Foryou';
 import Followsuggestions from './Followsuggestions';
@@ -6,6 +8,59 @@ import Sidebar from './Sidebar';
 
 const Dashboard = () => {
     const [content, setContent] = useState("foryou");
+    const navigate = useNavigate()
+
+    const [names, setNames] = useState([])
+    const [users, setUsers] = useState([])
+
+    const getUsersHandle = async () => {
+
+        try {
+            const response = await fetch(`${api}/api/user/`, {
+                method: "GET",
+                credentials: "include"
+            })
+            const result = await response.json()
+            if (response.ok) {
+                setUsers(result)
+            }
+        } catch (error) {
+            console.log("ERROR:", error)
+        }
+    }
+
+    const navigateHandle = async (username, id) => {
+        try {
+            const response = await fetch(`${api}/api/user/check/${id}`, {
+                method: "GET",
+                credentials: "include"
+            })
+            const result = await response.json()
+
+            if (response.ok) {
+
+                navigate(`/userprofile/${username}/${result.text}`)
+            }
+        } catch (error) {
+            console.log("Error:", error)
+        }
+
+    }
+
+    const searchHandle = (e) => {
+        const query = e.target.value.toLowerCase();
+        if (query == "") {
+            setNames([])
+            return
+        }
+        const result = users.filter((user) => user.username.toLowerCase().includes(query));
+        setNames(result)
+    }
+
+    useEffect(() => {
+        getUsersHandle()
+    }, [])
+
 
     return (
         <div className="flex h-screen w-full bg-gray-100">
@@ -41,11 +96,44 @@ const Dashboard = () => {
             </div>
 
             {/* Follow Suggestions (Right Sidebar) */}
-            <div className="w-0 lg:w-1/3 hidden lg:flex flex-col p-4 ">
-                <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200 h-1/2 overflow-y-auto">
+            <div className="hidden lg:block w-1/3 p-4 overflow-hidden">
+                {/* Search Section */}
+                <div className="flex flex-col items-center gap-4">
+                    <form className="w-full max-w-sm">
+                        <input
+                            type="text"
+                            onChange={searchHandle}
+                            placeholder="Search Users by names🔍..."
+                            className="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-full outline-none transition duration-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-300 shadow-md"
+                        />
+                    </form>
+
+                    {/* Search Results */}
+                    <div className="flex flex-col items-center gap-2 max-h-60 overflow-y-auto w-full">
+                        {names.length > 0 ? (
+                            names.map((user, index) => (
+                                <h3
+                                    key={index}
+                                    className="px-5 py-2 bg-gray-100 text-gray-800 text-lg rounded-full shadow-sm hover:bg-gray-200 transition duration-200 cursor-pointer"
+                                    onClick={() => navigateHandle(user.username, user._id)}
+                                >
+                                    @{user.username}
+                                </h3>
+                            ))
+                        ) : (
+                            <p className="text-gray-500">Not Found..</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* Follow Suggestions Section */}
+                <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200 mt-4 max-h-72 overflow-y-auto">
                     <Followsuggestions />
                 </div>
             </div>
+
+
+
 
         </div>
     );
