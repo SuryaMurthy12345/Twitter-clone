@@ -6,10 +6,10 @@ import { api } from './config';
 
 import Dashboard from './DashboardPages/Dashboard';
 import Forgotpassword from './Forgotpassword';
+import Onepost from './Onepost';
 import Notification from './SidebarPages/Notification';
 import Profile from './SidebarPages/Profile';
 import Userprofile from './Userprofile';
-import Onepost from './Onepost';
 
 const App = () => {
   const [auth, setAuth] = useState(null); // ✅ Prevents flashing
@@ -32,12 +32,6 @@ const App = () => {
   };
 
   useEffect(() => {
-    setInterval(() => {
-      fetch("https://twitter-clone-p3wh.onrender.com")
-        .then(() => console.log("Backend pinged!"))
-        .catch((err) => console.error("Ping failed:", err));
-    }, 10 * 60 * 1000); // Every 10 minutes
-    
     verifyUser();
   }, [auth]); // ✅ Runs on mount + when auth changes
 
@@ -51,7 +45,7 @@ const App = () => {
         <Route path='/forgot' element={<Forgotpassword />} />
         <Route path='/notification' element={<Notification />} />
         <Route path='/profile' element={<Profile />} />
-        <Route path='/post/:id' element={<Onepost/>} />
+        <Route path='/post/:id' element={<Onepost />} />
         <Route path='/userprofile/:username/:text' element={<Userprofile />} />
 
         <Route path='/dashboard' element={auth ? <Dashboard /> : <Navigate to='/signin' />} />
