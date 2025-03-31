@@ -32,6 +32,12 @@ const App = () => {
   };
 
   useEffect(() => {
+    setInterval(() => {
+      fetch("https://twitter-clone-p3wh.onrender.com")
+        .then(() => console.log("Backend pinged!"))
+        .catch((err) => console.error("Ping failed:", err));
+    }, 10 * 60 * 1000); // Every 10 minutes
+    
     verifyUser();
   }, [auth]); // ✅ Runs on mount + when auth changes
 
