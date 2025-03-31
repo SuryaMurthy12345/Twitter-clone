@@ -14,7 +14,7 @@ import userRoutes from './routes/user.routes.js';
 const app = express()
 app.use(
     cors({
-        origin: "https://frontend-lpt8fgfuu-murthys-projects-2b9aff5c.vercel.app", // Allow frontend origin
+        origin: "https://frontend-2zpqwygns-murthys-projects-2b9aff5c.vercel.app", // Allow frontend origin
         credentials: true, // Allow cookies
     })
 );
