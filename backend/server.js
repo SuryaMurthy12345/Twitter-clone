@@ -14,8 +14,8 @@ import userRoutes from './routes/user.routes.js';
 const app = express()
 app.use(
     cors({
-        origin: "https://twitter-clone-p3wh.onrender.com", // Replace with your frontend URL
-        credentials: true, // Required for cookies to be sent
+        origin: "https://frontend-lpt8fgfuu-murthys-projects-2b9aff5c.vercel.app/signin", // Allow frontend origin
+        credentials: true, // Allow cookies
     })
 );
 app.use(express.json())
