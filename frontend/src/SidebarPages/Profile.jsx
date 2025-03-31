@@ -232,7 +232,7 @@ const Profile = () => {
       <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 p-8 flex-row justify-around mx-4">
+      <div className="flex-1 p-8 flex-row justify-centeryyyy mx-4">
         {profile ? (
           <div className="w-full max-w-2xl bg-white shadow-lg rounded-2xl overflow-hidden">
             {/* Cover Image */}

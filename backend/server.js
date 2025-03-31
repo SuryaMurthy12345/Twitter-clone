@@ -14,8 +14,8 @@ import userRoutes from './routes/user.routes.js';
 const app = express()
 app.use(
     cors({
-        origin: "http://localhost:3000", // Allow frontend origin
-        credentials: true, // Allow cookies
+        origin: "https://twitter-clone-p3wh.onrender.com", // Replace with your frontend URL
+        credentials: true, // Required for cookies to be sent
     })
 );
 app.use(express.json())
