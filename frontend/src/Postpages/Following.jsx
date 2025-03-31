@@ -4,7 +4,7 @@ import { api } from "../config";
 import Createpost from "./Createpost";
 import { commentHandle, commentSubmitHandle, deleteCommentHandle, likesHandle } from "./Helpful";
 
-const Following = () => {
+const Foryou = () => {
   const [posts, setPosts] = useState([]);
   const [postid, setPostid] = useState("");
   const [text, setText] = useState("");
@@ -22,7 +22,8 @@ const Following = () => {
       const result = await response.json();
       if (response.ok) {
         console.log("Posts fetched successfully");
-        setPosts(result);
+        setPosts(result.allposts);
+        setPresentUser(result.presentuser)
       } else {
         console.log("Error", result.error);
       }
@@ -30,6 +31,23 @@ const Following = () => {
       console.log("Error", error);
     }
   };
+
+  const navigateHandle = async (username, id) => {
+    try {
+      const response = await fetch(`${api}/api/user/check/${id}`, {
+        method: "GET",
+        credentials: "include"
+      })
+      const result = await response.json()
+      if (response.ok) {
+
+        navigate(`/userprofile/${username}/${result.text}`)
+      }
+    } catch (error) {
+      console.log("Error:", error)
+    }
+
+  }
 
   useEffect(() => {
     fetchPosts();
@@ -44,7 +62,7 @@ const Following = () => {
         {posts.length > 0 ? (
           posts.map((post) => (
             <div key={post._id} className="border p-4 m-4 rounded-xl shadow-lg bg-white">
-              <div className="flex flex-row p-2 cursor-pointer" >
+              <div className="flex flex-row p-2 cursor-pointer" onClick={() => { post.user._id === presentuser ? (navigate('/profile')) : (navigateHandle(post.user.username, post.user._id)) }} >
                 <img
                   className="w-10 h-10 rounded-full object-cover border border-gray-300"
                   src={post.user.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"}
@@ -92,16 +110,18 @@ const Following = () => {
                   <div className="max-h-[200px] overflow-y-auto border p-2 rounded-lg bg-white">
                     {comments.length > 0 ? (
                       comments.map((comment) => (
-                        <div key={comment._id} className="border-b p-2 flex gap-3 items-center hover:cursor-pointer" onClick={() => navigate(`/userprofile/${comment.user.username}`)}>
+                        <div key={comment._id} className="border-b p-2 flex gap-3 items-center hover:cursor-pointer">
                           {/* User Profile Image */}
-                          <img
-                            className="w-8 h-8 rounded-full object-cover border border-gray-300"
-                            src={comment.user.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"}
-                            alt="Profile"
-                          />
-                          <div className="flex flex-col w-full">
-                            <h2 className="font-bold text-sm">@{comment.user.username}</h2>
-                            <p className="text-gray-700 text-sm">{comment.text}</p>
+                          <div onClick={() => { comment.user._id === presentuser ? (navigate('/profile')) : (navigateHandle(comment.user.username, comment.user._id)) }} className="flex gap-3 items-center cursor-pointer">
+                            <img
+                              className="w-8 h-8 rounded-full object-cover border border-gray-300"
+                              src={comment.user.profileImg || "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"}
+                              alt="Profile"
+                            />
+                            <div className="flex flex-col w-full">
+                              <h2 className="font-bold text-sm">@{comment.user.username}</h2>
+                              <p className="text-gray-700 text-sm">{comment.text}</p>
+                            </div>
                           </div>
 
                           {/* Delete Button (Only for the comment owner) */}
@@ -145,4 +165,4 @@ const Following = () => {
   );
 };
 
-export default Following;
+export default Foryou;
